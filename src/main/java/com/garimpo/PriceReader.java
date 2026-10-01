@@ -17,6 +17,10 @@ public class PriceReader {
 
     public BigDecimal read(String url) throws IOException {
         Document doc = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(15_000).maxBodySize(0).get();
+        return extract(doc);
+    }
+
+    BigDecimal extract(Document doc) throws IOException {
         BigDecimal price = fromNextData(doc);
         if (price == null) price = fromLdJson(doc);
         if (price == null) price = fromMeta(doc);

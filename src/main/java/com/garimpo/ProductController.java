@@ -30,13 +30,8 @@ public class ProductController {
 
     private View view(Product p) {
         List<PriceRecord> rs = records.findByProductIdAndDayGreaterThanEqual(p.id, LocalDate.now().minusDays(90));
-        BigDecimal avg = null, min = null;
-        if (!rs.isEmpty()) {
-            avg = rs.stream().map(r -> r.price).reduce(BigDecimal.ZERO, BigDecimal::add)
-                    .divide(BigDecimal.valueOf(rs.size()), 2, RoundingMode.HALF_UP);
-            min = rs.stream().map(r -> r.price).min(Comparator.naturalOrder()).get();
-        }
-        return new View(p.id, p.name, p.url, p.targetPrice, p.currentPrice, avg, min, rs.size(), p.lastCheck);
+        PriceStats s = PriceStats.of(rs);
+        return new View(p.id, p.name, p.url, p.targetPrice, p.currentPrice, s.avg(), s.min(), s.days(), p.lastCheck);
     }
 
     @GetMapping
